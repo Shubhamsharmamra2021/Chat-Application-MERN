@@ -1,7 +1,7 @@
 {
   "name": "chatapplication",
   "version": "1.0.0",
-  "description": "cha application",
+  "description": "chat application",
   "main": "server.js",
   "scripts": {
     "start": "nodemon"

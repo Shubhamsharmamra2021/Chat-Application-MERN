@@ -13,7 +13,7 @@ function App () {
   const [socket, setSocket] = React.useState(null);
   const setupSocket =() =>{
     const token = localStorage.getItem("CC_Token");
-    if(token.length > 0 && !socket){
+    if(token && !socket){
       const newSocket =io("http://localhost:5000", {
         query: {
             token: localStorage.getItem("CC_Token"),
@@ -34,7 +34,7 @@ function App () {
 
   React.useEffect(()=>{
     setupSocket();
-  },[]);
+  });
 
   return  (
     <BrowserRouter>

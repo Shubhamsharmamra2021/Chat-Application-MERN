@@ -12,7 +12,7 @@ mongoose.connection.on("error", (err) =>{
     console.log("Mongoose Connection ERROR: "+ err.message)
 });
 
-mongoose.connection.once('open',()=>{
+mongoose.connection.once("open",()=>{
     console.log("Mongoose Connection Succesful !")
 
 })
@@ -25,34 +25,66 @@ require("./model/message");
 
 
 // server listen
-const app =require('./app.js');
+const app =require("./app.js");
 const server =app.listen(5000,()=>{
    console.log(`Server listening on port ${5000}`);
 });
-
-const io =require("socket.io")(server);
+ 
+ const io =require("socket.io")({
+    cors: {
+        origin: "http://localhost:5000",
+        methods: ["GET", "POST"]
+    }
+}
+);
 const jwt = require("jwt-then");
+ 
+const Message =mongoose.model("Message");
+const User =mongoose.model("User");
 
-io.use(async(socket,next)=>{
+io.use(async(socket, next)=>{
     try{
-        console.log("welcome");         
-
         const token = socket.handshake.query.token; 
-        
         const payload = await jwt.verify(token, process.env.SECRET);
-    
         socket.userId =payload.id;
         next();
     }
-    catch(err){
-    console.log("welcome");         
-    }
+    catch(err){  }
 
 });
 
-io.on('connection',(socket)=>{
+io.on("connection",(socket)=>{
     console.log("Connected:" + socket.userId);
-    socket.on('disconnect',()=>{
+    socket.on("disconnect",(socket)=>{
         console.log("Disconnected: " + socket.userId);
-    })
-})
+    });
+
+    socket.on("joinRoom",({chatroomId})=>{
+        socket.join(chatroomId);
+        console.log("A user joined chatroom :" +chatroomId);
+        });
+
+        socket.on("leaveRoom",({chatroomId})=>{
+            socket.join(chatroomId);
+            console.log("A user leave chatroom :" +chatroomId);
+        });
+
+        socket.on("chatroomMessage",async({chatroomId, message})=>{
+          
+            if(message.trim().length>0){
+                const user =await User.findOne({_Id: socket.userId})
+                const newMessage =new Message({
+                    chatroom:chatroomId,
+                    user: socket.userId,
+                    message,
+                })           
+                io.to(chatroomId).emit("newMessages",{
+                message,
+                name:user.name,
+                userId: socket.userId,
+            });
+            await newMessage.save();
+           }
+            
+        });
+});

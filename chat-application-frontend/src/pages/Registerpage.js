@@ -1,7 +1,7 @@
 import React from 'react';
-import axios from 'axios';
-import makeToast from '../Toaster';
-
+import axios from 'axios'
+import makeToast from '../Toaster'
+ 
 
 const Registerpage = (props) => {
     const nameRef =React.createRef();
