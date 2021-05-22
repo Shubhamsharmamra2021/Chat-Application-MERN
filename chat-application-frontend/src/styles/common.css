@@ -1,0 +1,12 @@
+.chatroom{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.join{
+    background: #F7C52A;
+    padding: 0.25rem 1rem;
+    border-radius: 2px;
+}
